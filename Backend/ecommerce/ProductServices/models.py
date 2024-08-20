@@ -56,3 +56,35 @@ class Products(models.Model):
     class Meta:
         ordering = ('-created_at')
 
+class ProductQuestions(models.Model):
+    id=models.AutoField(primary_key=True)
+    question=models.TextField()
+    answer=models.TextField()
+    status=models.CharField(max_length=255,choices=[('ACTIVE','ACTIVE'),('INACTIVE','INACTIVE')],default='ACTIVE')
+    product_id=models.ForeignKey(Products,on_delete=models.CASCADE,blank=True,null=True,related_name='product_id_questions')
+    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_questions')
+    question_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='questions_by_user_id_questions')
+    answer_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='answer_by_user_id_questions')
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return str(self.question)
+    
+    class Meta:
+        ordering = ('-created_at')
+
+class ProductReviews(models.Model):
+    id=models.AutoField(primary_key=True)
+    review_images=models.JSONField()
+    rating=models.FloatField()
+    reviews=models.TextField()
+    status=models.CharField(max_length=255,choices=[('ACTIVE','ACTIVE'),('INACTIVE','INACTIVE')],default='ACTIVE')
+    product_id=models.ForeignKey(Products,on_delete=models.CASCADE,blank=True,null=True,related_name='product_id_reviews')
+    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_reviews')
+    review_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_reviews')
+    created_at=models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ('-created_at')
+
