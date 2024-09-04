@@ -90,4 +90,62 @@ class PurchaseOrderItems(models.Model):
     returned_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'returned_by_user_id_purchase_order')
     returned_at = models.DateTimeField(null=True,blank=True)
     returned_at = models.DateTimeField()
+    
+    def __str__(self) -> str:
+        return str(self.po_id, self.product_id)
 
+    class Meta:
+        ordering = ('-created_date')
+
+class PurchaseOrderInwardedLog(models.Model):
+    id = models.AutoField(primary_key=True)
+    po_id = models.ForeignKey(PurchaseOrder, on_delete = models.CASCADE, blank=True, null = True, related_name='po_id')    
+    invoice_path = models.TextField()
+    invoice_number = models.CharField(max_length=255)
+    notes = models.CharField()
+    inwarded_by_user_id = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True, null=True )
+    inwarded_at = models.DateTimeField()
+    additional_details = models.JSONField()
+    domain_user_id = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True, null=True, related_name='domain_user_)id')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+        
+    def __str__(self) -> str:
+        return str(self.po_id)
+
+    class Meta:
+        ordering = ('-created_at')
+
+class PurchaseOrderItemInwardedLog(models.Model):
+    id = models.AutoField(primary_key=True)
+    po_item_id = models.ForeignKey(PurchaseOrder, on_delete = models.CASCADE, blank=True, null = True, related_name='po_item_id')    
+    inwarded_quantity = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    tax_pecentage = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount=models.DecimalField(max_digits=10,decimal_places=2)
+    discount_type=models.CharField(max_length=255,choices=[('PERCENTAGE','PERCENTAGE'),('AMOUNT','AMOUNT'),('NO DISCOUNT','NO DISCOUNT')],default='NO DISCOUNT')
+    shipping_amount=models.DecimalField(max_digits=10,decimal_places=2,default=0)
+    shipping_tax_percentage=models.DecimalField(max_digits=10,decimal_places=2,default=0)
+    additional_details = models.JSONField()
+    status=models.CharField(max_length=255,choices=[('DRAFT','DRAFT'),('CREATED','CREATED'),('APPROVED','APPROVED'),('SENT','SENT'),('RECEIVED','RECEIVED'),('PARTIAL RECEIVED','PARTIAL RECEIVED'),('CANCELLED','CANCELLED'),('RETURNED','RETURNED')],default='DRAFT')
+    domain_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'domain_user_id')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return str(self.po_id)
+
+    class Meta:
+        ordering = ('-created_at')
+
+
+class PurchaseOrderLogs(models.Model):
+    id = models.AutoField(primary_key=True)
+    po_id = models.ForeignKey(PurchaseOrder, on_delete = models.CASCADE, blank=True, null = True, related_name='po_id')    
+    notes = models.TextField()
+    created_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'created_by_user_id_purchase_order')
+    updated_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'updated_by_user_id_purchase_order')
+    domain_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'domain_user_id_purchase_order')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
