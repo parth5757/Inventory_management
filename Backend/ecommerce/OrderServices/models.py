@@ -144,7 +144,8 @@ class PurchaseOrderItemInwardedLog(models.Model):
 class PurchaseOrderLogs(models.Model):
     id = models.AutoField(primary_key=True)
     po_id = models.ForeignKey(PurchaseOrder, on_delete = models.CASCADE, blank=True, null = True, related_name='po_id')    
-    notes = models.TextField()
+    comment = models.TextField()
+    additional_details = models.JSONField()
     created_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'created_by_user_id_purchase_order')
     updated_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'updated_by_user_id_purchase_order')
     domain_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'domain_user_id_purchase_order')
@@ -245,7 +246,7 @@ class SalesOrderItems(models.Model):
     returned_at = models.DateTimeField()
     
     def __str__(self) -> str:
-        return str(self.po_id, self.product_id)
+        return str(self.so_id, self.product_id)
 
     class Meta:
         ordering = ('-created_date')
@@ -266,7 +267,7 @@ class SalesOrderOutwardedLog(models.Model):
 
         
     def __str__(self) -> str:
-        return str(self.po_id)
+        return str(self.so_id)
 
     class Meta:
         ordering = ('-created_at')
@@ -288,7 +289,7 @@ class SalesOrderItemOutwardedLog(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return str(self.po_id)
+        return str(self.so_id)
 
     class Meta:
         ordering = ('-created_at')
@@ -301,7 +302,12 @@ class SalesOrderLogs(models.Model):
     created_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'created_by_user_id_purchase_order')
     updated_by_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'updated_by_user_id_purchase_order')
     domain_user_id = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name = 'domain_user_id_purchase_order')
+    additional_details = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return str(self.so_id)
 
+    class Meta:
+        ordering = ('-created_date')   
