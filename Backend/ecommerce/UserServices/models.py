@@ -26,7 +26,7 @@ class Users(AbstractUser):
     last_device=models.CharField(max_length=50,blank=True,null=True)
     last_ip=models.GenericIPAddressField(blank=True,null=True)
     currency=models.CharField(max_length=50,blank=True,null=True,default='INR',choices=(('USD','USD'),('INR','INR'),('EUR','EUR'),('GBP','GBP'),('AUD','AUD'),('CAD','CAD'),('JPY','JPY'),('CNY','CNY'),('RUB','RUB'),('BRL','BRL'),('ZAR','ZAR'),('NGN','NGN'),('MXN','MXN'),('ARS','ARS'),('CHF','CHF'),('SEK','SEK'),('NOK','NOK'),('DKK','DKK'),('PLN','PLN'),('CZK','CZK'),('TRY','TRY'),('UAH','UAH'),('HUF','HUF'),('RON','RON'),('BGN','BGN'),('HRK','HRK'),('SLO','SLO'),('SK','SK'),('LT','LT'),('LV','LV'),('EE','EE'),('IE','IE'),('SC','SC'),('WL','WL'),('NI','NI'),('NZ','NZ'),('SGD','SGD'),('MYR','MYR'),('THB','THB'),('IDR','IDR'),('PHP','PHP'),('VND','VND'),('KRW','KRW'),('KPW','KPW'),('TWD','TWD'),('HKD','HKD'),('MOP','MOP'),('BDT','BDT'),('PKR','PKR'),('LKR','LKR'),('NPR','NPR'),('BTN','BTN'),('MVR','MVR'),('AFN','AFN'),('IRR','IRR'),('IQD','IQD'),('SYP','SYP'),('LBN','LBN')))
-    domain_user_id = models.ForeignKey('self', on_delete=models.CASCADE , blank=True, null=True)
+    domain_user_id = models.ForeignKey('self', on_delete=models.CASCADE , blank=True, null=True, related_name='domain_user_id_user')
     domain_name = models.CharField(max_length=50, blank=True,null=True)
     plan_type = models.CharField(max_length=50, blank=True, null=True, choices=(('Free','Free'),('Basic','Basic'),('Standard', 'Standard'),('Premium', 'Premium'),('Enterprise', 'Enterprise')))
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,11 +36,11 @@ class Users(AbstractUser):
         return str(self.username)
 
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 class UserShippingAddress(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='user_shipping_address')
     address = models.TextField()
     city=models.CharField(max_length=50)
     state=models.CharField(max_length=50)
@@ -53,7 +53,7 @@ class UserShippingAddress(models.Model):
         return str(self.user)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 class Modules(models.Model):
     id = models.AutoField(primary_key=True)
@@ -61,7 +61,7 @@ class Modules(models.Model):
     is_menu = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     module_url = models.TextField()
-    parent_id = models.ForeignObject('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent_id = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     display_order = models.IntegerField(default=0)
     module_description = models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
@@ -71,18 +71,18 @@ class Modules(models.Model):
         return str(self.module_name)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
     
 class UserPermission(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE,related_name='user_permissions_1')
     module = models.ForeignKey(Modules, on_delete=models.CASCADE)
     is_view = models.BooleanField(default=False)
     is_add = models.BooleanField(default=False)
     is_edit = models.BooleanField(default=False)
     is_delete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    domain_user_id = models.CharField(max_length=50, blank=True, null=True)
+    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_user_permissions')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
 
@@ -90,11 +90,11 @@ class UserPermission(models.Model):
         return str(self.user)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 class ActivityLog(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.Foreignkey(Users, on_delete=models.CharField)
+    user=models.ForeignKey(Users,on_delete=models.CASCADE,related_name='user_activity_log')
     activity_type = models.CharField(max_length=50, blank=True, null=True)
     activity_date = models.DateTimeField(auto_now_add=True)
     activity_ip = models.GenericIPAddressField()
@@ -108,4 +108,6 @@ class ActivityLog(models.Model):
         return str(self.user)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
+
+

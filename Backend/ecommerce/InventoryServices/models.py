@@ -10,8 +10,8 @@ class Warehouse(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
-    pincode = models.IntegerField(max_length=10)
-    Warehouse_manager = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True, null=True, related_name='warehouse_manager')
+    pincode = models.IntegerField()
+    Warehouse_manager = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True, null=True, related_name='warehouse_manager_id')
     phone = models.CharField(max_length=255)
     email = models.EmailField()
     status = models.CharField(max_length=255, choices=[('ACTIVE', 'ACTIVE'), ('INACTIVE', 'INACTIVE')], default='ACTIVE')
@@ -19,8 +19,8 @@ class Warehouse(models.Model):
     capacity = models.CharField(max_length=255, choices=[('LOW','LOW'),('MEDIUM', 'MEDIUM'),('HIGH','HIGH')], default='LOw')
     Warehouse_type = models.CharField(max_length=255, choices=[('OWNED', 'OWNED'),('LEASED','LEASED')])
     additional_details = models.JSONField()
-    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_products')
-    added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_products')
+    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_warehouse')
+    added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_warehouse')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
 
@@ -28,27 +28,27 @@ class Warehouse(models.Model):
         return str(self.name)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 class RackAndShelvesAndFloor(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
-    warehouse_id = models.ForeignKey(Warehouse, on_delete=models.CASCADE, blank=True, null=True, related_name='warehouse_id')
+    warehouse_id = models.ForeignKey('Warehouse', on_delete=models.CASCADE, related_name='rack_shelves_floors')
     rack = models.CharField(max_length=255, blank=True, null=True)
     shelf = models.CharField(max_length=255, blank=True, null=True)
     floor = models.CharField(max_length=255, blank=True, null=True)
     additional_details = models.JSONField()
-    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_products')
-    added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_products')
+    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_products_rack_shelf_floor')
+    added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_rack_shelf_floor')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
 
 
     def __str__(self) -> str:
-        return str(self.so_id)
+        return str(self.name)
 
     class Meta:
-        ordering = ('-created_date')   
+        ordering = ('-created_at',)   
 
 class Inventory(models.Model):
     id = models.AutoField(primary_key=True)
@@ -68,17 +68,22 @@ class Inventory(models.Model):
     received_date = models.DateTimeField(blank=True, null=True)
     expiry_date = models.DateTimeField(blank=True, null=True)
     quantity_inwarded = models.IntegerField()
-    buy_price = models.DecimalField(max_digits=2, decimal_places=3)
-    sell_price = models.DecimalField(max_digits=2, decimal_places=3)
+    buy_price = models.DecimalField(max_digits=10, decimal_places=2)
+    sell_price = models.DecimalField(max_digits=10, decimal_places=2)
     tax_percentage = models.DecimalField(max_digits=2, decimal_places=2)
     stock_status = models.CharField(max_length=255, choices=[('IN_STOCK', 'IN_STOCK'), ('OUT_OF_STOCK', 'OUT_OF_STOCK'),('DAMAGED', 'DAMAGED'),('LOST', 'LOST')], default='IN_STOCK')
     inward_time = models.CharField(max_length=255, choices=[('PURCHASE', 'PURCHASE'), ('RETURN', 'RETURN'), ('REPLACEMENT', 'REPLACEMENT'), ('WAREHOUSE TRANSFER', 'WAREHOUSE TRANSFER')], default='PURCHASE')
-
     additional_details = models.JSONField()
-    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_products')
-    added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_products')
+    domain_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='domain_user_id_inventory')
+    added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_inventory')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+    
+    def __str__(self) -> str:
+        return str(self.purchase_order_id)
+    
+    class Meta:
+        ordering = ('-created_at',)
 
 class InventoryLog(models.Model):
     id=models.AutoField(primary_key=True)
@@ -94,3 +99,9 @@ class InventoryLog(models.Model):
     added_by_user_id=models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True,related_name='added_by_user_id_inventory_log')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return str(self.inventory_id, self.warehouse_id)
+    
+    class Meta:
+        ordering = ('-created_at',)

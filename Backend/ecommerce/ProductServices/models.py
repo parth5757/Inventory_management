@@ -9,8 +9,8 @@ class Categories (models.Model):
     description=models.TextField()
     display_order=models.IntegerField(default=0)
     parent_id=models. ForeignKey('self', on_delete=models. CASCADE, blank=True, null=True)
-    domain_user_id=models.ForeignKey(Users, on_delete=models. CASCADE, blank=True, null=True, related_name='domain_user_id')
-    added_by_user_id=models.ForeignKey(Users, on_delete=models. CASCADE, blank=True, null=True, related_name='added_by_user_id')
+    domain_user_id=models.ForeignKey(Users, on_delete=models. CASCADE, blank=True, null=True, related_name='domain_user_id_category')
+    added_by_user_id=models.ForeignKey(Users, on_delete=models. CASCADE, blank=True, null=True, related_name='added_by_user_id_category')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
 
@@ -18,7 +18,7 @@ class Categories (models.Model):
         return str(self.name)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 
 class Products(models.Model):
@@ -54,7 +54,7 @@ class Products(models.Model):
         return str(self.name)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 class ProductQuestions(models.Model):
     id=models.AutoField(primary_key=True)
@@ -72,7 +72,7 @@ class ProductQuestions(models.Model):
         return str(self.question)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
 class ProductReviews(models.Model):
     id=models.AutoField(primary_key=True)
@@ -86,5 +86,5 @@ class ProductReviews(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
 
