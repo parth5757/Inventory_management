@@ -1,0 +1,12 @@
+virtualenv env
+env/scripts/activate
+pip install django
+django-admin startproject ecommerce
+django-admin startapp InventoryServices
+django-admin startapp OrderServices
+django-admin startapp ProductServices
+django-admin startapp UserServices
+python manage.py makemigrations
+python manage.py migrate
+pip install djangorestframework
+pip install djangorestframework-simplejwtpip install virtualenv
