@@ -15,7 +15,8 @@ class SignupAPIView(APIView):
         profile_pic = request.data.get("profile_pic")
 
         if username is None or email is None or password is None or profile_pic is None:
-            return Response({"access":str(access), refresh:str(refresh), "error": "Please provide username, email and password"}, status=status.HTTP_400_BAD_REQUEST)
+            print(username, email)
+            return Response({"error": "Please provide username, email and password"}, status=status.HTTP_400_BAD_REQUEST)
         
         user = Users.objects.create_user(username=username, email=email, password=password, profile_pic=profile_pic)
         user.save()
@@ -27,10 +28,26 @@ class SignupAPIView(APIView):
         access[profile_pic] = user.profile_pic
         
 
-        return Response({"refresh": str(refresh), "access": str(access), "message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"access":str(access), refresh:str(refresh), "message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
         # check at 27:00 minute
 
+"""
+Login API.
+
+This API is used to login a user to the system.
+
+Parameters:
+username (str): The username of the user.
+password (str): The password of the user.
+
+Returns:
+Response: A response containing a refresh token and an access token.
+
+Raises:
+Response: A response with status code 400 if the username or password is not provided.
+Response: A response with status code 401 if the credentials are invalid.
+"""
 class LoginAPIView(APIView):
     def post(self, request):
         username = request.data.get("username")
@@ -54,7 +71,13 @@ class LoginAPIView(APIView):
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+
     def get(self, request):
+        """
+        GET /auth/login/
+        
+        Returns a message to tell the user to use the POST method to login
+        """
         return Response({"message":"please use Post method to login"})
     
 
