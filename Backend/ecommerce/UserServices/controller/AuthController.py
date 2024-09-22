@@ -8,6 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class SignupAPIView(APIView):
+    def get(self, request):
+        return Response({"message":"get request is not accepted"})
+
     def post(self, request):
         username = request.data.get("username")
         email = request.data.get("email")
@@ -29,8 +32,6 @@ class SignupAPIView(APIView):
         
 
         return Response({"access":str(access), refresh:str(refresh), "message": "User created successfully"}, status=status.HTTP_201_CREATED)
-
-        # check at 27:00 minute
 
 """
 Login API.
@@ -78,7 +79,7 @@ class LoginAPIView(APIView):
         
         Returns a message to tell the user to use the POST method to login
         """
-        return Response({"message":"please use Post method to login"})
+        return Response({"message":"please use Post method to login"}) 
     
 
 class PublicAPIView(APIView):
