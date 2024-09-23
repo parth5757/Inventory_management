@@ -84,7 +84,12 @@ class LoginAPIView(APIView):
 
 class PublicAPIView(APIView):
     def get(self, request):
-        return Response({"message":"this is publicly accessible api"})
+        ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
+        if ip_address:
+            ip_address = ip_address.split(',')[0]
+        else:
+            ip_address = request.META.get('REMOTE_ADDR')
+        return Response({"message":f'Your IP address is: {ip_address}'})
 
 class ProtectedAPIView(APIView):
     authentication_classes = [JWTAuthentication]
