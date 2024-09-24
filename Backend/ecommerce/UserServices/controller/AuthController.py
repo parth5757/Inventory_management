@@ -15,23 +15,23 @@ class SignupAPIView(APIView):
         username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
-        profile_pic = request.data.get("profile_pic")
+        phone = request.data.get("phone")
 
-        if username is None or email is None or password is None or profile_pic is None:
+        if username is None or email is None or password is None or phone is None:
             print(username, email)
             return Response({"error": "Please provide username, email and password"}, status=status.HTTP_400_BAD_REQUEST)
         
-        user = Users.objects.create_user(username=username, email=email, password=password, profile_pic=profile_pic)
+        user = Users.objects.create_user(username=username, email=email, password=password, phone=phone)
         user.save()
 
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
-        access[username] = user.username
-        access[email] = user.email
-        access[profile_pic] = user.profile_pic
+        access["username"] = user.username
+        access["email"] = user.email
+        access["phone"] = user.phone
         
 
-        return Response({"access":str(access), refresh:str(refresh), "message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"access":str(access), "refresh" :str(refresh), "message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
 """
 Login API.
@@ -63,7 +63,7 @@ class LoginAPIView(APIView):
             access = refresh.access_token
             access["username"] = user.username
             access["email"] = user.email
-            access["profile_pic"] = user.profile_pic
+            access["phone"] = user.phone
 
             return Response({
                 'refresh': str(refresh),
