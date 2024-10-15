@@ -19,7 +19,7 @@ class SignupAPIView(APIView):
 
         if username is None or email is None or password is None or phone is None:
             print(username, email)
-            return Response({"error": "Please provide username, email and password"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Please provide username, email, phone, and password"}, status=status.HTTP_400_BAD_REQUEST)
         
         user = Users.objects.create_user(username=username, email=email, password=password, phone=phone)
         user.save()
@@ -96,4 +96,4 @@ class ProtectedAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self,request):
-        return Response({"message": "This is protected API."})
+        return Response({"message": "This is protected API."})  

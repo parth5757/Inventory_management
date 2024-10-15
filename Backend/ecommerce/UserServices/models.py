@@ -38,6 +38,9 @@ class Users(AbstractUser):
     class Meta:
         ordering = ('-created_at',)
 
+    def defaultkey():
+        return 'username'
+
 class UserShippingAddress(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='user_shipping_address')
