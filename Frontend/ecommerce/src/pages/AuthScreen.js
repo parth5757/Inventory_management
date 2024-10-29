@@ -1,27 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Card, CardContent, Tabs, Tab, TextField, Button, Box } from '@mui/material';
-import useApi from '../hooks/APIHandler'
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/material.css'; // Import Material theme for react-phone-input-2
+import useApi from '../hooks/APIHandler';
 
 function AuthScreen() {
   const [activeTab, setActiveTab] = useState(0);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [phone, setPhone] = useState('');
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    setErrorMessage(''); // Reset error message on tab switch
   };
 
-  const {callApi, error, loading} = useApi();
-  // sending login form detail to the server
-  const doLogin = async(e) => {
+  const { callApi, error, loading } = useApi();
+
+  const validatePhoneNumber = (phone) => {
+    const formattedPhone = phone.replace(/^\+91/, ''); // Strip +91 for validation
+    return formattedPhone.length === 12 && /^\d+$/.test(formattedPhone); // 10 digits required after +91
+  };
+
+  const doLogin = async (e) => {
     e.preventDefault();
-    let response = await callApi({url:"http://localhost:8000/api/auth/login/", method:"POST", body:{username:e.target.username.value, password:e.target.password.value}})
+    let response = await callApi({
+      url: "http://localhost:8000/api/auth/login/",
+      method: "POST",
+      body: {
+        username: e.target.username.value,
+        password: e.target.password.value
+      }
+    });
     console.log("data response: ", response);
-  }
-  // sending signup form detail to the server
-  const doSignup = async(e) => {
+  };
+
+  const doSignup = async (e) => {
     e.preventDefault();
-    let response = await callApi({url:"http://localhost:8000/api/auth/signup/", method:"POST", body:{username:e.target.username.value, password:e.target.password.value, email:e.target.email.value, profile_pic: "https://media.istockphoto.com/id/1406197730/photo/portrait-of-a-young-handsome-indian-man.jpg?s=1024x1024&w=is&k=20&c=VruKKTu4jBF2xPEEQUMWwd4bwJPysSsqLuZ7h1OyD8M="}})
-    console.log(response);
+    const password = e.target.password.value;
+    const confirmPasswordValue = e.target.confirmPassword.value;
+
+    if (password !== confirmPasswordValue) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+
+    if (!validatePhoneNumber(phone)) {
+      setErrorMessage("Phone number must have exactly 10 digits after +91");
+      return;
+    }
+
+    const response = await callApi({
+      url: "http://localhost:8000/api/auth/signup/",
+      method: "POST",
+      body: {
+        username: e.target.username.value,
+        email: e.target.email.value,
+        phone: `+${phone}`, // Add "+" before the phone number
+        password: password,
+      }
+    });
+
+    if (error) {
+      setErrorMessage(error);
+    } else if (response && response.data) {
+      console.log("Signup response: ", response.data);
+    }
+  };
+  // Redirect to login tab on successful signup
+  useEffect(() => {
+  if (signupSuccess) {
+    setActiveTab(0); // Switch to login tab
+    setSignupSuccess(false); // Reset signup success flag
+    setErrorMessage(''); // Clear any error messages
   }
+  }, [signupSuccess]);
+
   return (
     <Container maxWidth="sm" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <Card>
@@ -46,9 +101,40 @@ function AuthScreen() {
             <Box sx={{ mt: 2 }}>
               <h2>Sign Up</h2>
               <form onSubmit={doSignup}>
-                <TextField label="Username" name="username"  fullWidth margin="normal" variant="outlined" />
+                <TextField label="Username" name="username" fullWidth margin="normal" variant="outlined" />
                 <TextField label="Email" name="email" fullWidth margin="normal" variant="outlined" />
+                <PhoneInput
+                  country={'in'}
+                  onlyCountries={['in']}
+                  value={phone}
+                  onChange={(value) => setPhone(value)}
+                  inputStyle={{
+                    width: '100%',
+                    paddingLeft: '50px',
+                    paddingTop: '18.5px',
+                    paddingBottom: '18.5px',
+                    marginTop: '16px',
+                    marginBottom: '8px',
+                    borderRadius: '4px',
+                    fontSize: '16px',
+                  }}
+                  containerStyle={{ width: '100%' }}
+                  // disableCountryCode
+                  // disableDropdown
+                  placeholder="Enter 10-digit phone number"
+                />
                 <TextField label="Password" name="password" type="password" fullWidth margin="normal" variant="outlined" />
+                <TextField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                {errorMessage && <Box sx={{ color: 'red', mt: 1 }}>{errorMessage}</Box>}
                 <Button variant="contained" color="primary" fullWidth type="submit">Sign Up</Button>
               </form>
             </Box>
