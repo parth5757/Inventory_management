@@ -90,8 +90,8 @@ function AuthScreen() {
             <Box sx={{ mt: 2 }}>
               <h2>Login</h2>
               <form onSubmit={doLogin}>
-                <TextField label="Username" name="username" fullWidth margin="normal" variant="outlined" />
-                <TextField label="Password" name="password" type="password" fullWidth margin="normal" variant="outlined" />
+                <TextField label="Username" name="username" fullWidth margin="normal" variant="outlined" required />
+                <TextField label="Password" name="password" type="password" fullWidth margin="normal" variant="outlined" required />
                 <Button variant="contained" color="primary" fullWidth type="submit">Login</Button>
               </form>
             </Box>
@@ -101,8 +101,8 @@ function AuthScreen() {
             <Box sx={{ mt: 2 }}>
               <h2>Sign Up</h2>
               <form onSubmit={doSignup}>
-                <TextField label="Username" name="username" fullWidth margin="normal" variant="outlined" />
-                <TextField label="Email" name="email" fullWidth margin="normal" variant="outlined" />
+                <TextField label="Username" name="username" fullWidth margin="normal" variant="outlined" required/>
+                <TextField label="Email" name="email" fullWidth margin="normal" variant="outlined" required/>
                 <PhoneInput
                   country={'in'}
                   onlyCountries={['in']}
@@ -121,6 +121,7 @@ function AuthScreen() {
                   containerStyle={{ width: '100%' }}
                   // disableCountryCode
                   // disableDropdown
+                  specialLabel = ""
                   placeholder="Enter 10-digit phone number"
                 />
                 <TextField label="Password" name="password" type="password" fullWidth margin="normal" variant="outlined" />
