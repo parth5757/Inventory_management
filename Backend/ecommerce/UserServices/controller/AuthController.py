@@ -25,11 +25,12 @@ class SignupAPIView(APIView):
         return Response({"message":"get request is not accepted"})
 
     # posting entered user details to server with checking all validation
-    def post(self, request):
+    def post(self, request):    
         username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
         phone = request.data.get("phone")
+        profile_pic = request.FILES.get("profile_pic")  # Use FILES to get uploaded file
 
         # Validation for missing fields
         if not all([username, email, password, phone]):
@@ -59,6 +60,8 @@ class SignupAPIView(APIView):
             
         # create user
         user = Users.objects.create_user(username=username, email=email, password=password, phone=phone)
+        if profile_pic:
+            user.profile_pic = profile_pic
         user.save()
 
         refresh = RefreshToken.for_user(user)
