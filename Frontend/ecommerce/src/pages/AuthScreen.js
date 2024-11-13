@@ -1,9 +1,15 @@
+// Import from react library
 import React, { useState, useEffect } from 'react';
+// react router imports
+import { useNavigate } from "react-router-dom";
+// mui library import
 import { Container, Card, CardContent, Tabs, Tab, TextField, Button, Box } from '@mui/material';
+// external different library
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
-import useAPI from '../hooks/APIHandler';
 import { toast } from 'react-toastify'
+// Internal(Custom) Hooks
+import useAPI from '../hooks/APIHandler';
 
 function AuthScreen() {
   const [activeTab, setActiveTab] = useState(0);
@@ -11,11 +17,11 @@ function AuthScreen() {
   const [phone, setPhone] = useState('');
   const [profilePic, setProfilePic] = useState(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
   const { callApi, error, loading } = useAPI();  // apihandler work // loading is used at apihandler.
 
   const validatePhoneNumber = (phone) => {
@@ -29,6 +35,7 @@ function AuthScreen() {
     const username = e.target.username.value;
     const password = e.target.password.value;
 
+    
     if (!username || !password) {
       toast.error("Username and password are required");
       return;
@@ -44,6 +51,7 @@ function AuthScreen() {
       if (response?.data?.access) {
         localStorage.setItem("token", response.data.access);
         toast.success("Login successful!");
+        navigate("/home");
       } else {
         toast.error("Invalid username or password");
       }
@@ -55,7 +63,6 @@ function AuthScreen() {
 
   const doSignup = async (e) => {
     e.preventDefault();
-  
     const password = e.target.password.value;
     const confirmPasswordValue = e.target.confirmPassword.value;
   

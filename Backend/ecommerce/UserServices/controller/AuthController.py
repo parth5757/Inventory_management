@@ -299,13 +299,16 @@ class LoginAPIView(APIView):
         if user:
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
+
+            # Adding custom claims
             access["username"] = user.username
             access["email"] = user.email
             access["phone"] = user.phone
+                
 
             return Response({
                 'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'access': str(access),
             })
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
