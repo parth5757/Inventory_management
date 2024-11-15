@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 class Users(AbstractUser):
     name = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15, blank=True, null=True) #, unique=True(remember at next migration)
+    phone = models.CharField(max_length=15, blank=True, null=True) #, unique=True(remember at next migration & also assure that all entry have unique number if not then first change the number)
     address = models.TextField()
     city = models.CharField(max_length=150, blank=True, null=True)
     state = models.CharField(max_length=50, blank=True, null=True)
