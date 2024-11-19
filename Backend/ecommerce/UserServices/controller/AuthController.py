@@ -72,7 +72,7 @@ def compare_with_existing_users_profile_pics(uploaded_image_path):
 
         known_image_encoding = known_image_encodings[0]
         face_distance = face_recognition.face_distance([known_image_encoding], uploaded_image_encoding)[0]
-        match_percentage = (1 - face_distance) * 100
+        match_percenFtage = (1 - face_distance) * 100
 
         if match_percentage > 50:
             matches.append((user.username, match_percentage))
@@ -87,6 +87,10 @@ class SignupAPIView(APIView):
         password = request.data.get("password")
         phone = request.data.get("phone")
         profile_pic = request.FILES.get("profile_pic")
+
+        phoneCheck = Users.objects.filter(phone=phone)
+        if phoneCheck.exists():
+            return Response({"error": "phone already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate required fields
         if not all([username, email, password, phone]):
@@ -132,6 +136,8 @@ class SignupAPIView(APIView):
 
         # Create new user if no match is found
         user = Users.objects.create_user(username=username, email=email, password=password, phone=phone)
+        if request.data.get('domain_user_id'):
+            user.domain_user_id = Users.objects.get(id=request.data.get('domain_user_id'))
         if profile_pic:
             user.profile_pic = profile_pic
         user.save()

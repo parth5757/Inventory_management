@@ -32,6 +32,11 @@ class Users(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.domain_user_id and self.id:
+            self.domain_user_id=Users.objects.get(id=self.id)
+        super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return str(self.username)
 

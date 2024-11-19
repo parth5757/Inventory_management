@@ -2,7 +2,6 @@
 import './App.css';
 import Layout from './layout/layout';
 import Home from './pages/Home';
-import AuthScreen from './pages/AuthScreen';
 import Auth from './pages/Auth';
 import ProtectedRoute from './utils/ProtectedRoute';
 // react router dom library
@@ -23,6 +22,12 @@ const sidebarItems=[
 const router = createBrowserRouter(
   [
     {path:"/auth", element:<Auth />},
+    {
+      path:"/",
+      element:<Layout sidebarList={sidebarItems}/>, 
+      children:[
+        {path:"", element:<ProtectedRoute element={<Home />} />}
+      ]},
     {
       path:"/",
       element:<Layout sidebarList={sidebarItems}/>,
