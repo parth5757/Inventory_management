@@ -198,7 +198,7 @@ const Auth = () => {
               )}
             </CardContent>
             <Box sx={{ textAlign: 'center', py: 2, borderTop: '1px solid', borderColor: theme.palette.divider }}>
-              <Typography variant="body2" color="text.secondary">© 2024 My Brand Name. All rights reserved.</Typography>
+              <Typography variant="body2" color="text.secondary">© 2024 lekha All rights reserved.</Typography>
             </Box>
           </Card>
         </Box>

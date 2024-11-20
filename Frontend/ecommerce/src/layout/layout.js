@@ -459,7 +459,7 @@ const Layout = ({sidebarList,pageTitle}) => {
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                My Brand - Version 1.0.0 (2024)
+                lekha - Version 1.0.0 (2024)
               </Typography>
             </Box>
           </Box>

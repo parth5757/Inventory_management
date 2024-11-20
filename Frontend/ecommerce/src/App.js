@@ -4,6 +4,7 @@ import Layout from './layout/layout';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
 import ProtectedRoute from './utils/ProtectedRoute';
+import OTPVerifyPage from './pages/OTPVerifyPage';
 // react router dom library
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -22,18 +23,21 @@ const sidebarItems=[
 const router = createBrowserRouter(
   [
     {path:"/auth", element:<Auth />},
+    {path:"verify", element:<ProtectedRoute element={<OTPVerifyPage />} />},
     {
       path:"/",
       element:<Layout sidebarList={sidebarItems}/>, 
       children:[
         {path:"", element:<ProtectedRoute element={<Home />} />}
-      ]},
+      ]
+    },
     {
       path:"/",
       element:<Layout sidebarList={sidebarItems}/>,
       children:[
         {path:"home", element:<ProtectedRoute element={<Home />} />}
-      ]},
+      ]
+    },
   ]
 )
 
