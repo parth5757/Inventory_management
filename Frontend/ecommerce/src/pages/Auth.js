@@ -87,10 +87,11 @@ const Auth = () => {
         localStorage.setItem("token", response.data.access);
         toast.success("Login successful!");
         navigate("/home");
-      } else {
-        toast.error("Invalid username or password");
-      }
+      }// else {
+      //   toast.error("Invalid username or password");
+      // }
     } catch (err) {
+      toast.error(err);
       toast.error("An error occurred. Please try again.");
     }
   };
