@@ -13,6 +13,7 @@ import re
 import phonenumbers
 from random import randint
 import face_recognition
+from UserServices.task import test_fun
 
 # Function to create necessary directories
 def ensure_directory_exists(path):
@@ -192,3 +193,10 @@ class ProtectedAPIView(APIView):
     def get(self, request):
         return Response({"message": "This is a protected API."})
 
+class Test(APIView):
+    def get(self, request):
+        test_fun.delay()
+        return Response({"Done"})
+    
+
+# celery -A ecommerce.celery worker --pool=solo-l info
