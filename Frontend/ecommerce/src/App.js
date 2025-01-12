@@ -22,8 +22,15 @@ const sidebarItems=[
 
 const router = createBrowserRouter(
   [
-    {path:"/auth", element:<Auth />},
-    {path:"verify", element:<ProtectedRoute element={<OTPVerifyPage />} />},
+    // just for the simple way working explanation reference 
+    // {path:"/auth", element:<Auth />},
+    {path:"/auth", element:<ProtectedRoute element={<Auth />}/>},
+    // otp page routing
+    {path:"/verify", element:<ProtectedRoute element={<OTPVerifyPage />} />},
+
+  
+    
+    // Home page routing
     {
       path:"/",
       element:<Layout sidebarList={sidebarItems}/>, 
@@ -41,6 +48,7 @@ const router = createBrowserRouter(
   ]
 )
 
+// the main app which having everything of react project pages are connected  
 function App(){
   return(
     <>
