@@ -87,9 +87,9 @@ const Auth = () => {
         localStorage.setItem("token", response.data.access);
         toast.success("Login successful!");
         navigate("/home");
-      }// else {
-      //   toast.error("Invalid username or password");
-      // }
+      } else {
+         toast.error(response.data.error);
+      }
     } catch (err) {
       toast.error(err);
       toast.error("An error occurred. Please try again.");
@@ -140,13 +140,13 @@ const Auth = () => {
       });
 
       if (response?.data?.error === "Username not available") {
-        toast.error("Username not available.");
+        toast.error("Username not available.");f
         const suggestions = response.data.suggestions;
         if (suggestions?.length > 0) {
           toast.info(`Suggested usernames: ${suggestions.join(", ")}`);
         }
       } else if (response?.data) {
-        localStorage.setItem("token", response.data.access);
+        localStorage.setItem("ET", response.data.access);
         toast.success("Signup successful");
         setSignupSuccess(true);
       } else {
@@ -160,8 +160,9 @@ const Auth = () => {
 
   useEffect(() => {
     if (signupSuccess) {
-      setActiveTab(0);
+      setActiveTab(0); //remove this only navigate is required
       setSignupSuccess(false);
+      navigate("/verify"); // directly navigate to the verify page
     }
   }, [signupSuccess]);
 
