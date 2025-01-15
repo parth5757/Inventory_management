@@ -140,7 +140,7 @@ const Auth = () => {
       });
 
       if (response?.data?.error === "Username not available") {
-        toast.error("Username not available.");f
+        toast.error("Username not available.");
         const suggestions = response.data.suggestions;
         if (suggestions?.length > 0) {
           toast.info(`Suggested usernames: ${suggestions.join(", ")}`);
