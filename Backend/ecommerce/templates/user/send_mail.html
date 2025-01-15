@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email OTP</title>
+  <style>
+    /* Inline styles for email compatibility */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #32CD32;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .body {
+      padding: 20px;
+      color: #333333;
+    }
+    .body h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    .otp-box {
+      margin: 20px 0;
+      padding: 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #f9fafb;
+      border: 1px dashed #32CD32;
+      border-radius: 8px;
+      color: #000000;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #777777;
+      background-color: #f9f9f9;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Verify Your Email</h1>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+      <h2>Hi {{ user }},</h2>
+      <p>Thank you for signing up! Please use the OTP below to verify your email address:</p>
+      <div class="otp-box">
+        {{ OTP }}
+      </div>
+      <p>If you didn't request this email, you can safely ignore it.</p>
+      <p>Best regards,<br>Your Company Team</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>This is an automated email. Please do not reply to this email.</p>
+      <p>&copy; {{ current_year }} lekha.dev. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
