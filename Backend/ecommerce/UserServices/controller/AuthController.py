@@ -9,11 +9,13 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
+# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 import re
 import phonenumbers
 from random import randint
 import face_recognition
-from UserServices.task import test_fun
+from UserServices.task import send_otp_handler
+from django.core.cache import cache
 
 # Function to create necessary directories
 def ensure_directory_exists(path):
@@ -145,10 +147,23 @@ class SignupAPIView(APIView):
 
         # Generate tokens and respond
         refresh = RefreshToken.for_user(user)
-        return Response({"access": str(refresh.access_token), "refresh": str(refresh), "message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        access = refresh.access_token
+        access["email"] = user.email
+
+        send_otp_handler.delay(user.email)
 
 
+        return Response(
+            {
+                "access": str(access), 
+                "refresh": str(refresh), 
+                "message": "User created successfully",
+            "SE": request.session.get("email")
+            }, 
+            status=status.HTTP_201_CREATED)
 
+
+        
 class LoginAPIView(APIView):
     def post(self, request):
         username = request.data.get("username")
@@ -159,6 +174,7 @@ class LoginAPIView(APIView):
         
         user = authenticate(request, username=username, password=password)
         if user:
+            # if user.is_verify:
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
 
@@ -172,18 +188,21 @@ class LoginAPIView(APIView):
                 'refresh': str(refresh),
                 'access': str(access),
             })
+
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
+# just for personal test
 class PublicAPIView(APIView):
     def get(self, request):
         ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
         if ip_address:
             ip_address = ip_address.split(',')[0]
+            result = cache.get('test22@lekha.dev')
+            print(result)
         else:
             ip_address = request.META.get('REMOTE_ADDR')
-        return Response({"message": f'Your IP address is: {ip_address}'})
+        return Response({"message": f'Your IP address is: {result}'})
 
 
 class ProtectedAPIView(APIView):
@@ -192,11 +211,12 @@ class ProtectedAPIView(APIView):
 
     def get(self, request):
         return Response({"message": "This is a protected API."})
-
+# just for personal test
 class Test(APIView):
     def get(self, request):
-        test_fun.delay()
-        return Response({"Done"})
-    
+        # test_fun.delay()
+        email = "me@parththakkar.in"
+        send_otp_handler.delay(email)
+        return Response({"Otp sended on given email"})
 
-# celery -A ecommerce.celery worker --pool=solo-l info
+# celery -A ecommerce.celery worker --pool=solo -l info
