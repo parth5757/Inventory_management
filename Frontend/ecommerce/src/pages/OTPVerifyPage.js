@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Box, Card, CardContent, TextField, Button, CssBaseline, ThemeProvider, createTheme, Typography, LinearProgress } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, CssBaseline, ThemeProvider, createTheme, LinearProgress } from '@mui/material';
 import { ThemeProvider as Emotion10ThemeProvider } from '@emotion/react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -7,9 +7,11 @@ import { orangeDarkTheme, orangeLightTheme, basicTheme, darkTheme, lightTheme, c
 import { GlobalStyles } from '../layout/GlobalStyle';
 import useAPI from '../hooks/APIHandler';
 import OtpInput from 'react-otp-input';
+import { getEmail } from '../utils/Helper'
 
 const OTPVerifyPage = () => {
   const [otp, setOtp] = useState('');
+  const [email, setEmail] = useState(''); // State to store session email
   const [themeMode, setThemeMode] = useState('basic');
   const { callApi, loading } = useAPI();
   const navigate = useNavigate();
@@ -17,7 +19,36 @@ const OTPVerifyPage = () => {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'basic';
     setThemeMode(savedTheme);
-  }, []);
+    
+
+    // Fetch email from session
+    const fetchTokenEmail = async () => {
+      try {
+        const response = await callApi({
+          url: 'http://localhost:8000/api/auth/verify-email/', // Backend endpoint to fetch session email
+          method: 'POST',
+        });
+
+        if (response?.data?.email) {
+          alert(response?.data?.email)
+          setEmail(response.data.email); // Set the session email in state
+        }
+        // else take from jwt token email 
+        else {
+          setEmail(getEmail().email)
+        } 
+        // else {
+        //   toast.error('Failed to fetch session email.');
+        // }
+      } catch (err) {
+        toast.error('An error occurred while fetching session email.');
+      }
+    };
+    // check if email already fetch from server then not send request again 
+    if (email.length == 0){
+      fetchTokenEmail();
+    }
+  }, [callApi]);
 
   const theme = useMemo(() => {
     switch (themeMode) {
@@ -87,17 +118,21 @@ const OTPVerifyPage = () => {
                 OTP Verification
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Please enter the OTP sent to your registered phone number.
+                Please enter the OTP sent to your registered email.
+              </Typography>
+              {/* Dynamically display the email */}
+              <Typography variant="body2" color="text.secondary">
+                Email: <strong>{email || 'Loading...'}</strong>
               </Typography>
               <Box component="form" sx={{ mt: 2 }} onSubmit={handleOtpSubmit}>
-                {/* <TextField
-                  label="OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  fullWidth
-                  margin="normal"
-                  required
-                /> */}
+                {/* Hidden input field to pass the email */}
+                <input type="hidden" name="email" value={email} />
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1, textDecoration: 'underline', color: theme.palette.primary.main, cursor: 'pointer' }}
+                >
+                  Change Email
+                </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <OtpInput
                     value={otp}
@@ -129,7 +164,7 @@ const OTPVerifyPage = () => {
             </CardContent>
             <Box sx={{ textAlign: 'center', py: 2, borderTop: '1px solid', borderColor: theme.palette.divider }}>
               <Typography variant="body2" color="text.secondary">
-                © 2024 My lekha Name. All rights reserved.
+                © 2025 lekha.dev. All rights reserved.
               </Typography>
             </Box>
           </Card>
