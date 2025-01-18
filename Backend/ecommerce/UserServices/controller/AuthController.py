@@ -162,7 +162,40 @@ class SignupAPIView(APIView):
             }, 
             status=status.HTTP_201_CREATED)
 
+class OTPVerifyEmailView(APIView):
+    # # to get all email which are currently in cache memory
+    def get(self, request):
+        # Construct cache key and fetch email from cache
+        cache_key = 'test29@lekha.dev'
+        otp = cache.get(cache_key)
 
+        keys = cache.keys('*')
+        if not keys:
+            return Response({"error":"no data found"})
+
+        all_cache_data = {key: cache.get(key) for key in keys}
+        
+        return Response(all_cache_data)
+
+    def post(self, request):
+        print("OTP request received")
+        # Retrieve email and OTP from request data
+        email = request.data.get("email")
+        otp = request.data.get("otp")
+
+        if not email:
+            return Response({"error": "Email is required."}, status=400)
+        if not otp:
+            return Response({"error": "OTP is required."}, status=400)
+
+        # Construct cache key and fetch email from cache
+        cache_key = f"otp_{email}"
+        cache_email = cache.get(cache_key)
+
+        if cache_email:
+            return Response({"email": cache_email, "otp": otp}, status=200)
+        else:
+            return Response({"error": "Invalid or expired OTP."}, status=404)
         
 class LoginAPIView(APIView):
     def post(self, request):
