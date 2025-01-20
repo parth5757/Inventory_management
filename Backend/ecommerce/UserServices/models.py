@@ -29,6 +29,7 @@ class Users(AbstractUser):
     domain_user_id = models.ForeignKey('self', on_delete=models.CASCADE , blank=True, null=True, related_name='domain_user_id_user')
     domain_name = models.CharField(max_length=50, blank=True,null=True)
     plan_type = models.CharField(max_length=50, blank=True, null=True, choices=(('Free','Free'),('Basic','Basic'),('Standard', 'Standard'),('Premium', 'Premium'),('Enterprise', 'Enterprise')))
+    is_verify = models.BooleanField(default=False, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
