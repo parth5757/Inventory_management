@@ -8,7 +8,7 @@ class Categories (models.Model):
     image=models.TextField()
     description=models.TextField()
     display_order=models.IntegerField(default=0)
-    parent_id=models. ForeignKey('self', on_delete=models. CASCADE, blank=False, null=False)
+    parent_id=models. ForeignKey('self', on_delete=models. CASCADE, blank=True, null=True)
     domain_user_id=models.ForeignKey(Users, on_delete=models. CASCADE, blank=True, null=True, related_name='domain_user_id_category')
     added_by_user_id=models.ForeignKey(Users, on_delete=models. CASCADE, blank=True, null=True, related_name='added_by_user_id_category')
     created_at=models.DateTimeField(auto_now_add=True)
