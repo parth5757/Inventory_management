@@ -18,7 +18,7 @@ function useApi() {
         setError(err.response.data.error); // Customize this based on the Django response structure
       } else if(err) {
         setError(err);
-        alert("sorry server having some issue we are working on this come back later.")
+        // alert("sorry server having some issue we are working on this come back later.")
       } else {
         setError("An error occurred. Please try again.");
       }
