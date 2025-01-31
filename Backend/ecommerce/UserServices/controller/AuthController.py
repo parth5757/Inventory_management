@@ -91,6 +91,12 @@ class SignupAPIView(APIView):
         phone = request.data.get("phone")
         profile_pic = request.FILES.get("profile_pic")
 
+        # Check same email is exist or not
+        emailCheck = Users.objects.filter(email=email)
+        if emailCheck.exists():
+            return Response({"error": "email is already exists"}, status=status.HTTP_400_BAD_REQUEST            )
+
+        # Check same phone number is exist or not
         phoneCheck = Users.objects.filter(phone=phone)
         if phoneCheck.exists():
             return Response({"error": "phone already exists"}, status=status.HTTP_400_BAD_REQUEST)
