@@ -2,11 +2,9 @@ import { jwtDecode } from 'jwt-decode';
 
 
 export const Authenticate = () => {
-    console.log("Welcome to Auth Page");
     const token = localStorage.getItem("token")
     const ET = localStorage.getItem("ET");
     if(ET){
-        console.log("the ET is going to delete", ET);
         localStorage.removeItem("ET");   
     } 
     // this check that toke exist if yes then check expiry if expiry then delete the token

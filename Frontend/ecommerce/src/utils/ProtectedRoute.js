@@ -9,12 +9,10 @@ const ProtectedRoute=({element})=>{
     }
     // this is at auth page if user authenticate come to login it don't allow to stay at that page 
     else if(element.type.name === "Auth"){
-        console.log("auth url route")
         return Authenticate()?element:<Navigate to="/home" />
     }
     // this is at otp verification at there only ET token allowed not any other 
     else if(element.type.name === "OTPVerifyPage"){
-        console.log("i am at otp")
         return isVerify()?element:<Navigate to="/auth" />
     }
 }
