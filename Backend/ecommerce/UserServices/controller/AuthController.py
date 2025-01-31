@@ -75,7 +75,7 @@ def compare_with_existing_users_profile_pics(uploaded_image_path):
 
         known_image_encoding = known_image_encodings[0]
         face_distance = face_recognition.face_distance([known_image_encoding], uploaded_image_encoding)[0]
-        match_percenFtage = (1 - face_distance) * 100
+        match_percentage = (1 - face_distance) * 100
 
         if match_percentage > 50:
             matches.append((user.username, match_percentage))
@@ -158,7 +158,7 @@ class SignupAPIView(APIView):
                 "access": str(access), 
                 "refresh": str(refresh), 
                 "message": "User created successfully",
-            "SE": request.session.get("email")
+                # "SE": request.session.get("email")
             }, 
             status=status.HTTP_201_CREATED)
 
