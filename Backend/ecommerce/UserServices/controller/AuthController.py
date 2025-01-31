@@ -201,7 +201,8 @@ class OTPVerifyEmailView(APIView):
         if cache_email:
             return Response({"email": cache_email, "otp": otp}, status=200)
         else:
-            return Response({"error": "Invalid or expired OTP."}, status=404)
+            return Response({"error": "Invalid or expired OTP."}, status=404
+
         
 class LoginAPIView(APIView):
     def post(self, request):
@@ -213,15 +214,23 @@ class LoginAPIView(APIView):
         
         user = authenticate(request, username=username, password=password)
         if user:
-            # if user.is_verify:
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
 
             # Adding custom claims
-            access["username"] = user.username
             access["email"] = user.email
+
+            if not user.is_verify:
+                send_otp_handler.delay(user.email)
+                return Response({
+                    'verify': "Your email is not verified. Please verify your email before logging in.",
+                    'ET': str(access),
+                })                
+
+            # Adding custom claims
+            access["username"] = user.username
             access["phone"] = user.phone
-                
+
 
             return Response({
                 'refresh': str(refresh),
@@ -229,7 +238,10 @@ class LoginAPIView(APIView):
             })
 
         else:
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                'permission': str("Not Allowed"),
+                'error': str("Invalid credentials"),
+            })
 
 # just for personal test
 class PublicAPIView(APIView):
