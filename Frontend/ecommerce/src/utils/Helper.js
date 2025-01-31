@@ -30,7 +30,14 @@ export const isVerify = () => {
         localStorage.removeItem("token");
     }
     if(ET){
-        return true;
+        const decodedToken = jwtDecode(ET);
+        const currentTime = Date.now()/1000
+        if(decodedToken.exp<currentTime){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
 
