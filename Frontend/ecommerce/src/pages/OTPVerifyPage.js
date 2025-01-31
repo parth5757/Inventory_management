@@ -11,7 +11,7 @@ import { getEmail } from '../utils/Helper'
 
 const OTPVerifyPage = () => {
   const [otp, setOtp] = useState('');
-  const [email, setEmail] = useState(''); // State to store session email
+  const [email, setEmail] = useState(''); // State to store session email 
   const [themeMode, setThemeMode] = useState('basic');
   const { callApi, loading } = useAPI();
   const navigate = useNavigate();
@@ -24,24 +24,25 @@ const OTPVerifyPage = () => {
     // Fetch email from session
     const fetchTokenEmail = async () => {
       try {
-        const response = await callApi({
-          url: 'http://localhost:8000/api/auth/verify-email/', // Backend endpoint to fetch session email
-          method: 'POST',
-        });
+        //  This is for session decode email which not working currently getting from jwt token
+        // const response = await callApi({
+        //   url: 'http://localhost:8000/api/auth/verify-email/', // Backend endpoint to fetch session email
+        //   method: 'POST',
+        // });
 
-        if (response?.data?.email) {
-          alert(response?.data?.email)
-          setEmail(response.data.email); // Set the session email in state
-        }
-        // else take from jwt token email 
-        else {
+        // if (response?.data?.email) {
+        //   alert(response?.data?.email)
+        //   setEmail(response.data.email); // Set the session email in state
+        // }
+        // // else take from jwt token email 
+        // else {
           setEmail(getEmail().email)
-        } 
+        // } 
         // else {
         //   toast.error('Failed to fetch session email.');
         // }
       } catch (err) {
-        toast.error('An error occurred while fetching session email.');
+        toast.error('An error occurred while fetching email.');
       }
     };
     // check if email already fetch from server then not send request again 
@@ -90,14 +91,15 @@ const OTPVerifyPage = () => {
 
     try {
       const response = await callApi({
-        url: 'http://localhost:8000/api/auth/verify-otp/',
+        url: 'http://localhost:8000/api/auth/verify-email/',
         method: 'POST',
-        body: { otp },
+        body: { otp, email },
       });
 
-      if (response?.data?.success) {
-        toast.success('OTP verified successfully!');
-        navigate('/home');
+      console.log("the response is:", response?.data);
+      if (response?.data?.verified) {
+        toast.success('Email verified successfully!');
+        navigate('/auth');
       } else {
         toast.error('Invalid OTP. Please try again.');
       }
