@@ -172,15 +172,15 @@ class OTPVerifyEmailView(APIView):
     # # to get all email which are currently in cache memory
     def get(self, request):
         # Construct cache key and fetch email from cache
-        cache_key = 'test29@lekha.dev'
-        otp = cache.get(cache_key)
+        # cache_key = 'wagag98069@kurbieh.com' # add your If any specific email you want to searchs
+        # otp = cache.get(cache_key)
 
         keys = cache.keys('*')
         if not keys:
-            return Response({"error":"no data found"})
+            return Response({"error":"no data found"}, status=status.HTTP_404_NOT_FOUND)
 
         all_cache_data = {key: cache.get(key) for key in keys}
-        
+        # otp_from_cache = cache.get(cache_key)
         return Response(all_cache_data)
 
     def post(self, request):
@@ -190,18 +190,33 @@ class OTPVerifyEmailView(APIView):
         otp = request.data.get("otp")
 
         if not email:
-            return Response({"error": "Email is required."}, status=400)
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
         if not otp:
-            return Response({"error": "OTP is required."}, status=400)
+            return Response({"error": "OTP is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Construct cache key and fetch email from cache
-        cache_key = f"otp_{email}"
-        cache_email = cache.get(cache_key)
+        # Construct cache key and fetch email from cache and get otp of that email. Validate email and make user is_verify True
+        otp_from_cache = cache.get(email)
 
-        if cache_email:
-            return Response({"email": cache_email, "otp": otp}, status=200)
-        else:
-            return Response({"error": "Invalid or expired OTP."}, status=404
+        if otp_from_cache is None:
+            return Response({"error": "Invalid or expired otp"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate otp
+        if str(otp_from_cache) == str(otp):
+            try:
+                # Update User Verification status
+                user = Users.objects.get(email=email)
+                user.is_verify = True
+                user.save()
+
+                # Clear the OTP from cache memory
+                cache.delete(email)
+
+                return Response({"verified": "User verify successfully"})
+            except Users.DoesNotExist:
+                return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({"error":f"An unexpected error occurred {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
         
 class LoginAPIView(APIView):
