@@ -70,29 +70,37 @@ const Auth = () => {
     e.preventDefault();
     const username = e.target.username.value;
     const password = e.target.password.value;
-
+  
     if (!username || !password) {
       toast.error("Username and password are required");
       return;
     }
-
+  
     try {
       const response = await callApi({
         url: "http://localhost:8000/api/auth/login/",
         method: "POST",
         body: { username, password },
       });
-
-      if (response?.data?.access) {
-        localStorage.setItem("token", response.data.access);
+      console.log("the response is:", response?.data);
+      const data = response?.data;
+      if (data?.error === "Invalid credentials") {
+        toast.error("Invalid credentials. Please try again.");
+      } else if (data?.verify) {
+        toast.warning("Your email is not verified. Please verify your email before logging in.");
+        localStorage.setItem("ET", response.data.ET);
+        navigate("/verify"); // Navigate to the verify page
+      } else if (data?.access) {
+        // alert(data?.access);
+        localStorage.setItem("token", data.access);
         toast.success("Login successful!");
         navigate("/home");
       } else {
-         toast.error(response.data.error);
+        toast.error("Unexpected response. Please try again.");
       }
     } catch (err) {
-      toast.error(err);
       toast.error("An error occurred. Please try again.");
+      console.error(err); // Log error for debugging purposes
     }
   };
 
