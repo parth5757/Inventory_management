@@ -7,5 +7,6 @@ urlpatterns = [
     path("protectedapi/", AuthController.ProtectedAPIView.as_view(), name="protectedApi"),
     path("signup/", AuthController.SignupAPIView.as_view(), name="signup"),
     path("verify-email/", AuthController.OTPVerifyEmailView.as_view(), name="get-email"),
+    path("resend_email/", AuthController.ResendOTPEmailView.as_view(), name="resend_email"),
     path("test_celery", AuthController.Test.as_view(), name="test_celery")
 ]

@@ -94,7 +94,7 @@ class SignupAPIView(APIView):
         # Check same email is exist or not
         emailCheck = Users.objects.filter(email=email)
         if emailCheck.exists():
-            return Response({"error": "email is already exists"}, status=status.HTTP_400_BAD_REQUEST            )
+            return Response({"error": "email is already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check same phone number is exist or not
         phoneCheck = Users.objects.filter(phone=phone)
@@ -217,7 +217,30 @@ class OTPVerifyEmailView(APIView):
             except Exception as e:
                 return Response({"error":f"An unexpected error occurred {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class ResendOTPEmailView(APIView):
+    def post(self, request):
+        # Retrieve email data
+        email = request.data.get("email")
 
+        if not email:
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check same email is exist or not
+        user = Users.objects.filter(email=email)
+        if user.exists():
+            print("Email exists")
+            # email verified or not
+            user = Users.objects.filter(email=email).first()
+            if(user.is_verify):
+                print("email is verified")
+                return Response({'message': 'user is already verified'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                send_otp_handler.delay(email)
+                return Response({'success': f'OTP Resend successfully on {email}'}, status=status.HTTP_200_OK)
+            
+        else:
+            print("Email does not exists")
+            return Response({"error": "Email is not exist in database."}, status=status.HTTP_400_BAD_REQUEST)            
         
 class LoginAPIView(APIView):
     def post(self, request):
