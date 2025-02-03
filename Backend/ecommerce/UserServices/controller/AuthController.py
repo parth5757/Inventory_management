@@ -16,6 +16,9 @@ from random import randint
 import face_recognition
 from UserServices.task import send_otp_handler
 from django.core.cache import cache
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
+import time
 
 # Function to create necessary directories
 def ensure_directory_exists(path):
@@ -217,7 +220,9 @@ class OTPVerifyEmailView(APIView):
             except Exception as e:
                 return Response({"error":f"An unexpected error occurred {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# @method_decorator(ratelimit(key="post:email:{email}", rate="1/2m", method="POST", block=True), name='dispatch')
 class ResendOTPEmailView(APIView):
+    # @ratelimit(key="post:email", rate="1/2m", method=("POST",), block=True)
     def post(self, request):
         # Retrieve email data
         email = request.data.get("email")
@@ -225,6 +230,16 @@ class ResendOTPEmailView(APIView):
         if not email:
             return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
         
+                # Check if the email is in cache (rate limit per unique email)
+        cache_key = f"otp_request_{email}"
+        last_request_time = cache.get(cache_key)
+
+        if last_request_time:
+            return Response({"error": "You can request OTP only once every 2 minutes."}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+        # Store the email in cache for 2 minutes (120 seconds)
+        cache.set(cache_key, time.time(), timeout=120)
+
         # Check same email is exist or not
         user = Users.objects.filter(email=email)
         if user.exists():
@@ -240,7 +255,7 @@ class ResendOTPEmailView(APIView):
             
         else:
             print("Email does not exists")
-            return Response({"error": "Email is not exist in database."}, status=status.HTTP_400_BAD_REQUEST)            
+            return Response({"error": "Email is not exist."}, status=status.HTTP_400_BAD_REQUEST) 
         
 class LoginAPIView(APIView):
     def post(self, request):

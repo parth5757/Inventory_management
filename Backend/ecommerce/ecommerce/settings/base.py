@@ -46,10 +46,10 @@ INSTALLED_APPS = [
     "OrderServices",
     "InventoryServices",
     # External Apps
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'corsheaders',
-    'django_celery_results'
+    'rest_framework', # DRF settings for installed app
+    'rest_framework_simplejwt', # DRF jwt token settings for installed app
+    'corsheaders', # DRF cross request handler between server(backend) and client(frontend)
+    'django_celery_results', # Django celery app
 ]
 
 MIDDLEWARE = [
@@ -112,9 +112,17 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
-    }
-}
+    },
+    "cache-for-ratelimiting":{
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2", # Use a separate Redis database index
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
+} #Redis Cache memory configuration & also ratelimiting
 
+RATELIMIT_USE_CACHE = 'cache-for-ratelimiting' # currently using default cache backend for rate limiting
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
