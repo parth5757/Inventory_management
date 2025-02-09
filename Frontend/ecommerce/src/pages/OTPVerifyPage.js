@@ -13,6 +13,8 @@ const OTPVerifyPage = () => {
   const [otp, setOtp] = useState('');
   const [email, setEmail] = useState(''); // State to store session email 
   const [themeMode, setThemeMode] = useState('basic');
+  const [timer, setTimer] = useState(5);
+  const [resendDisabled, setResendDisabled] = useState(true);
   const { callApi, loading } = useAPI();
   const navigate = useNavigate();
 
@@ -50,6 +52,18 @@ const OTPVerifyPage = () => {
       fetchTokenEmail();
     }
   }, [callApi]);
+
+  useEffect(() => {
+    let interval;
+    if(timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer-1);
+      }, 1000);
+    }else{
+      setResendDisabled(false);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const theme = useMemo(() => {
     switch (themeMode) {
@@ -105,6 +119,26 @@ const OTPVerifyPage = () => {
       }
     } catch (err) {
       toast.error('An error occurred during OTP verification. Please try again.');
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setResendDisabled(true);
+    setTimer(120);
+    try {
+      const response = await callApi({
+        url: 'http://localhost:8000/api/auth/resend-otp/',
+        method: 'POST',
+        body: { email },
+      });
+
+      if (response?.data?.success) {
+        toast.success('OTP resent successfully!');
+      } else {
+        toast.error('Failed to resend OTP. Please try again.');
+      }
+    } catch (err) {
+      toast.error('An error occurred while resending OTP.');
     }
   };
 
@@ -164,6 +198,30 @@ const OTPVerifyPage = () => {
                 )}
               </Box>
             </CardContent>
+            {/* Timer & Resend Button */}
+            <Box sx={{ textAlign: 'center', py:2}}>
+              {resendDisabled ?(
+                <Typography variant="body" color="text.secondary">
+                  You can request for new otp in {timer} seconds
+                  <br />
+                </Typography>
+              ) : (
+                <Typography variant="body" color="text.secondary">
+                  You can now request to another otp
+                  <br />
+                </Typography>
+              )}
+              {resendDisabled ?(
+                <Button disabled={true} variant="contained" color="primary" onClick={handleResendOTP}>
+                  Resend OTP
+                </Button>
+              ) : (
+                <Button disabled={false} variant="contained" color="primary" onClick={handleResendOTP}>
+                  Resend OTP
+                </Button>
+              )}
+            </Box>
+            {/* Copyrights */}
             <Box sx={{ textAlign: 'center', py: 2, borderTop: '1px solid', borderColor: theme.palette.divider }}>
               <Typography variant="body2" color="text.secondary">
                 © 2025 lekha.dev. All rights reserved.
