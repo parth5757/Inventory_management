@@ -28,7 +28,7 @@ def ensure_directory_exists(path):
 # Function to suggest unique usernames
 def suggest_username(username):
     suggestions = []
-    for i in range(5):
+    for i in range(120):
         new_username = f"{username}{randint(100, 999)}"
         if not Users.objects.filter(username=new_username).exists():
             suggestions.append(new_username)
@@ -230,11 +230,10 @@ class ResendOTPEmailView(APIView):
         if not email:
             return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
         
-                # Check if the email is in cache (rate limit per unique email)
-        cache_key = f"otp_request_{email}"
-        last_request_time = cache.get(cache_key)
-
-        if last_request_time:
+        # Check if the email is in cache (rate limit per unique email)
+        cache_key = email
+        last_request_time = cache.ttl(cache_key)
+        if last_request_time > 180:
             return Response({"error": "You can request OTP only once every 2 minutes."}, status=status.HTTP_429_TOO_MANY_REQUESTS)
 
         # Store the email in cache for 2 minutes (120 seconds)
@@ -243,11 +242,9 @@ class ResendOTPEmailView(APIView):
         # Check same email is exist or not
         user = Users.objects.filter(email=email)
         if user.exists():
-            print("Email exists")
             # email verified or not
             user = Users.objects.filter(email=email).first()
             if(user.is_verify):
-                print("email is verified")
                 return Response({'message': 'user is already verified'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 send_otp_handler.delay(email)
@@ -302,11 +299,9 @@ class PublicAPIView(APIView):
         ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
         if ip_address:
             ip_address = ip_address.split(',')[0]
-            result = cache.get('test22@lekha.dev')
-            print(result)
         else:
             ip_address = request.META.get('REMOTE_ADDR')
-        return Response({"message": f'Your IP address is: {result}'})
+        return Response({"message": f'Your IP address is: {ip_address}'})
 
 
 class ProtectedAPIView(APIView):
