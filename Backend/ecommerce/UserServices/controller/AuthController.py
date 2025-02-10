@@ -19,6 +19,7 @@ from django.core.cache import cache
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 import time
+from ecommerce.Helpers import renderResponse
 
 # Function to create necessary directories
 def ensure_directory_exists(path):
@@ -29,7 +30,7 @@ def ensure_directory_exists(path):
 def suggest_username(username):
     suggestions = []
     for i in range(120):
-        new_username = f"{username}{randint(100, 999)}"
+        new_username = f"{username}{randint(1000, 9999)}"
         if not Users.objects.filter(username=new_username).exists():
             suggestions.append(new_username)
     return suggestions
@@ -97,8 +98,9 @@ class SignupAPIView(APIView):
         # Check same email is exist or not
         emailCheck = Users.objects.filter(email=email)
         if emailCheck.exists():
-            return Response({"error": "email is already exists"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return renderResponse(data= "email is already exists", message='email is already exists', status=status.HTTP_400_BAD_REQUEST)
+            # return Response({"error": "email is already exists"}, status=status.HTTP_400_BAD_REQUEST)
+        
         # Check same phone number is exist or not
         phoneCheck = Users.objects.filter(phone=phone)
         if phoneCheck.exists():
