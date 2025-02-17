@@ -13,7 +13,7 @@ const OTPVerifyPage = () => {
   const [otp, setOtp] = useState('');
   const [email, setEmail] = useState(''); // State to store session email 
   const [themeMode, setThemeMode] = useState('basic');
-  const [timer, setTimer] = useState(5);
+  const [timer, setTimer] = useState(120);
   const [resendDisabled, setResendDisabled] = useState(true);
   const { callApi, loading } = useAPI();
   const navigate = useNavigate();
@@ -127,7 +127,7 @@ const OTPVerifyPage = () => {
     setTimer(120);
     try {
       const response = await callApi({
-        url: 'http://localhost:8000/api/auth/resend-otp/',
+        url: 'http://localhost:8000/api/auth/resend_otp/',
         method: 'POST',
         body: { email },
       });
