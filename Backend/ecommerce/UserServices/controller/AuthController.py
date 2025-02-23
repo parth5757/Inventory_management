@@ -20,7 +20,6 @@ from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 import time
 from ecommerce.Helpers import renderResponse
-from ecommerce.permission import IsSuperAdmin
 
 # Function to create necessary directories
 def ensure_directory_exists(path):
@@ -313,13 +312,6 @@ class ProtectedAPIView(APIView):
 
     def get(self, request):
         return Response({"message": "This is a protected API."})
-    
-class SuperAdminCheckAPI(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
-    def get(self, request):
-        return Response({"message": "This is a SuperAdmin API."})
-
 # just for personal test
 class Test(APIView):
     def get(self, request):

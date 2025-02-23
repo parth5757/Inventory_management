@@ -1,13 +1,18 @@
 from django.db.models import ForeignKey
 from rest_framework.response import Response
 from rest_framework.views import exception_handler 
-from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
+from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied, MethodNotAllowed
 
 def getDynamicFormModels():
     return {
         'product': 'ProductServices.Products',
         'category': 'ProductServices.Categories',
         'warehouse': 'InventoryServices.warehouse',
+    }
+
+def getSuperAdminDynamicFormModels():
+    return{
+        'modules': 'UserServices.Modules',
     }
 
 def checkisFileField(field):
@@ -95,5 +100,7 @@ def custom_exception_handler(exc, context):
         return renderResponse(data="User is not Authenticated", message="User is not Authenticated", status=exc.status_code)
     elif isinstance(exc, PermissionDenied):
         return renderResponse(data="You have not permission to access this page", message='PermissionDenied', status=exc.status_code)
+    elif isinstance(exc, MethodNotAllowed):
+        return renderResponse(data="On this API This method request is not accepted", message="On this API This method request is not accepted", status=exc.status_code)
     else:    
         return renderResponse(data=str(type(exc)), message='Failed', status=exc.status_code)
