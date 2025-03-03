@@ -2,6 +2,7 @@ from django.db.models import ForeignKey
 from rest_framework.response import Response
 from rest_framework.views import exception_handler 
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied, MethodNotAllowed
+from django.core.exceptions import FieldError
 
 def getDynamicFormModels():
     return {
@@ -90,6 +91,7 @@ def parseDictToList(data):
 
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
+    status_code = getattr(exc, 'status_code', 215)
     if isinstance(exc, AuthenticationFailed):
         response_data ={
             'message': exc.detail,
@@ -102,5 +104,9 @@ def custom_exception_handler(exc, context):
         return renderResponse(data="You have not permission to access this page", message='PermissionDenied', status=exc.status_code)
     elif isinstance(exc, MethodNotAllowed):
         return renderResponse(data="On this API This method request is not accepted", message="On this API This method request is not accepted", status=exc.status_code)
+    elif isinstance(exc, FieldError):
+        return renderResponse(data="There is an field error", message="there is an field error", status=status_code)
     else:    
         return renderResponse(data=str(type(exc)), message='Failed', status=exc.status_code)
+        # return renderResponse(data=str(type(exc)), message='Failed', status=status_code)
+        # return "error"
