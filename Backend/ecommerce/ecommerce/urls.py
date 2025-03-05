@@ -19,11 +19,14 @@ from django.contrib import admin
 from django.urls import path, include
 from UserServices.controller.DynamicFormController import DynamicFormController
 from UserServices.controller.SuperAdminDynamicFormController import SuperAdminDynamicFormController
+from UserServices.controller.SidebarController import ModuleView
 from django.conf.urls.static import static
 from ecommerce.settings import local
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("UserServices.urls")),
     path("api/getForm/<str:modelName>", DynamicFormController.as_view(), name="dynamicForm"),
-    path("api/superAdminForm/<str:modelName>/", SuperAdminDynamicFormController.as_view(), name="superadmindynamicForm")
+    path("api/superAdminForm/<str:modelName>/", SuperAdminDynamicFormController.as_view(), name="superadmindynamicForm"),
+    path("api/getMenus/", ModuleView.as_view(), name="sidebarmenu")
 ] + static(local.MEDIA_URL, document_root=local.MEDIA_ROOT)
