@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler 
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied, MethodNotAllowed
 from django.core.exceptions import FieldError
+from rest_framework import status
 
 def getDynamicFormModels():
     return {
@@ -106,6 +107,9 @@ def custom_exception_handler(exc, context):
         return renderResponse(data="On this API This method request is not accepted", message="On this API This method request is not accepted", status=exc.status_code)
     elif isinstance(exc, FieldError):
         return renderResponse(data="There is an field error", message="there is an field error", status=status_code)
+    elif isinstance(exc, AttributeError):
+        missing_attribute = str(exc)  # Extracts which attribute is missing
+        return renderResponse(data={"error": f"AttributeError: {missing_attribute}"}, message="Attribute Error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:    
         return renderResponse(data=str(type(exc)), message='Failed', status=exc.status_code)
         # return renderResponse(data=str(type(exc)), message='Failed', status=status_code)
